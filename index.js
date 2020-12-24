@@ -43,7 +43,7 @@ app.use((error, req, res, next) => {
 });
 
 axios.interceptors.request.use((req) => {
-  req.headers['X-Riot-Token'] = PERSONAL_API_KEY;
+  req.headers['X-Riot-Token'] = PERSONAL_API_KEY || '';
   return req;
 });
 
