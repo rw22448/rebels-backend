@@ -1,11 +1,14 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
+const cors = require('cors');
 const tftRoute = require('./tft/index');
 
 require('dotenv').config();
 
 const app = express();
+
+app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 const PERSONAL_API_KEY = process.env.PERSONAL_API_KEY;
