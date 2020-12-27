@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
-const PERSONAL_API_KEY = process.env.PERSONAL_API_KEY;
+const PERSONAL_API_KEY = process.env.PERSONAL_API_KEY || '';
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -23,7 +23,7 @@ app.use((error, req, res, next) => {
 });
 
 axios.interceptors.request.use((req) => {
-  req.headers['X-Riot-Token'] = PERSONAL_API_KEY || '';
+  req.headers['X-Riot-Token'] = PERSONAL_API_KEY;
   return req;
 });
 
