@@ -1,8 +1,7 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 const cors = require('cors');
-const tftRoute = require('./tft/index');
+const tft = require('./tft/index');
 
 require('dotenv').config();
 
@@ -13,33 +12,11 @@ app.use(cors());
 const PORT = process.env.PORT || 5000;
 const PERSONAL_API_KEY = process.env.PERSONAL_API_KEY;
 
-const oneSecondLimiter = rateLimit({
-  windowMs: 1 * 1000,
-  max: 20,
-});
-
-const twoMinuteLimiter = rateLimit({
-  windowMs: 2 * 1000 * 60,
-  max: 100,
-});
-
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.use(
-  '/tft/oc1',
-  twoMinuteLimiter,
-  oneSecondLimiter,
-  (req, res, next) => {
-    req.rebelsConfig = {
-      region: 'oc1',
-    };
-
-    next();
-  },
-  tftRoute
-);
+app.use('/tft', tft);
 
 app.use((error, req, res, next) => {
   res.status(error.response.status).json({ message: error.message });

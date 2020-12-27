@@ -1,23 +1,30 @@
 const express = require('express');
-const axios = require('axios');
-const router = express.Router({ mergeParams: true });
+const rateLimit = require('express-rate-limit');
+const router = express.Router();
+const api = require('./api');
 
-router.get(
-  '/get-summoner/by-name/:rebelsSummonerName',
-  async (req, res, next) => {
-    if (!req.rebelsConfig.region || !req.params.rebelsSummonerName) {
-      res.status(400).json({ message: 'Bad request' });
-    }
+const oneSecondLimiter = rateLimit({
+  windowMs: 1 * 1000,
+  max: 20,
+});
 
-    await axios
-      .get(
-        `https://${req.rebelsConfig.region}.api.riotgames.com/tft/summoner/v1/summoners/by-name/${req.params.rebelsSummonerName}`
-      )
-      .then((result) => {
-        res.status(result.status).json(result.data);
-      })
-      .catch((error) => next(error));
-  }
+const twoMinuteLimiter = rateLimit({
+  windowMs: 2 * 1000 * 60,
+  max: 100,
+});
+
+router.use(
+  '/oc1',
+  twoMinuteLimiter,
+  oneSecondLimiter,
+  (req, res, next) => {
+    req.rebelsConfig = {
+      region: 'oc1',
+    };
+
+    next();
+  },
+  api
 );
 
 module.exports = router;
