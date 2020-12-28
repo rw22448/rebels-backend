@@ -19,6 +19,10 @@ app.get('/', (req, res) => {
 app.use('/tft', tft);
 
 app.use((error, req, res, next) => {
+  if (!(error.response && error.response.status && error.response.message)) {
+    res.status(500).json({ message: 'Error fetching data' });
+  }
+
   res.status(error.response.status).json({ message: error.message });
 });
 
