@@ -32,7 +32,9 @@ router.get(
         `https://${req.rebelsConfig.region}.api.riotgames.com/tft/league/v1/entries/by-summoner/${req.params.encryptedSummonerId}`
       )
       .then((result) => {
-        res.status(result.status).json(result.data);
+        const rankData = result.data[0];
+
+        res.status(result.status).json(rankData);
       })
       .catch((error) => next(error));
   }
