@@ -32,9 +32,27 @@ router.get(
         `https://${req.rebelsConfig.region}.api.riotgames.com/tft/league/v1/entries/by-summoner/${req.params.encryptedSummonerId}`
       )
       .then((result) => {
-        const rankData = result.data[0];
+        if (result.data.length > 0) {
+          const rankData = result.data[0];
 
-        res.status(result.status).json(rankData);
+          res.status(result.status).json(rankData);
+        }
+
+        res.status(result.status).json({
+          leagueId: '',
+          summonerId: '',
+          summonerName: '',
+          queueType: '',
+          tier: 'UNRANKED',
+          rank: '',
+          leaguePoints: 0,
+          wins: 0,
+          losses: 0,
+          hotStreak: false,
+          veteran: false,
+          freshBlood: false,
+          inactive: false,
+        });
       })
       .catch((error) => next(error));
   }
