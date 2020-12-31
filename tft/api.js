@@ -36,23 +36,23 @@ router.get(
           const rankData = result.data[0];
 
           res.status(result.status).json(rankData);
+        } else {
+          res.status(result.status).json({
+            leagueId: '',
+            summonerId: '',
+            summonerName: '',
+            queueType: '',
+            tier: 'UNRANKED',
+            rank: '',
+            leaguePoints: 0,
+            wins: 0,
+            losses: 0,
+            hotStreak: false,
+            veteran: false,
+            freshBlood: false,
+            inactive: false,
+          });
         }
-
-        res.status(result.status).json({
-          leagueId: '',
-          summonerId: '',
-          summonerName: '',
-          queueType: '',
-          tier: 'UNRANKED',
-          rank: '',
-          leaguePoints: 0,
-          wins: 0,
-          losses: 0,
-          hotStreak: false,
-          veteran: false,
-          freshBlood: false,
-          inactive: false,
-        });
       })
       .catch((error) => next(error));
   }
