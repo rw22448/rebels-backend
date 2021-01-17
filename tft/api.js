@@ -11,12 +11,16 @@ router.get(
 
     await axios
       .get(
-        `https://${req.rebelsConfig.region}.api.riotgames.com/tft/summoner/v1/summoners/by-name/${req.params.rebelsSummonerName}`
+        encodeURI(
+          `https://${req.rebelsConfig.region}.api.riotgames.com/tft/summoner/v1/summoners/by-name/${req.params.rebelsSummonerName}`
+        )
       )
       .then((result) => {
         res.status(result.status).json(result.data);
       })
-      .catch((error) => next(error));
+      .catch((error) => {
+        next(error);
+      });
   }
 );
 
@@ -54,7 +58,9 @@ router.get(
           });
         }
       })
-      .catch((error) => next(error));
+      .catch((error) => {
+        next(error);
+      });
   }
 );
 
