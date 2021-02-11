@@ -2,6 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const api = require('./api');
+const regionalApi = require('./regionalApi');
 
 const oneSecondLimiter = rateLimit({
   windowMs: 1 * 1000,
@@ -165,6 +166,48 @@ router.use(
     next();
   },
   api
+);
+
+router.use(
+  '/americas',
+  twoMinuteLimiter,
+  oneSecondLimiter,
+  (req, res, next) => {
+    req.rebelsConfig = {
+      region: 'americas',
+    };
+
+    next();
+  },
+  regionalApi
+);
+
+router.use(
+  '/asia',
+  twoMinuteLimiter,
+  oneSecondLimiter,
+  (req, res, next) => {
+    req.rebelsConfig = {
+      region: 'asia',
+    };
+
+    next();
+  },
+  regionalApi
+);
+
+router.use(
+  '/europe',
+  twoMinuteLimiter,
+  oneSecondLimiter,
+  (req, res, next) => {
+    req.rebelsConfig = {
+      region: 'europe',
+    };
+
+    next();
+  },
+  regionalApi
 );
 
 module.exports = router;
