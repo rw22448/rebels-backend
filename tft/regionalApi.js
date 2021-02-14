@@ -43,6 +43,10 @@ router.get('/get-match-details', async (req, res) => {
   try {
     const array = JSON.parse(req.query.matchIds);
 
+    if (array.length <= 0) {
+      res.status(400).json({ message: 'matchIds array is empty' });
+    }
+
     const results = await Promise.all(
       array.map(async (matchId) => {
         return await axios
