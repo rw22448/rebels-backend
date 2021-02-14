@@ -18,20 +18,6 @@ app.get('/', (req, res) => {
 
 app.use('/tft', tft);
 
-app.use((error, req, res, next) => {
-  if (error) {
-    if (error.response) {
-      if (error.response.status && error.response.statusText) {
-        res
-          .status(error.response.status)
-          .json({ message: error.response.statusText });
-      }
-    }
-  }
-
-  res.status(500).json({ message: 'Error fetching data' });
-});
-
 axios.interceptors.request.use((req) => {
   req.headers['X-Riot-Token'] = PERSONAL_API_KEY;
   return req;
