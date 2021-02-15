@@ -13,7 +13,7 @@ router.get('/get-matches/by-puuid/:puuid', async (req, res) => {
   await axios
     .get(
       encodeURI(
-        `https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/${req.params.puuid}/ids`
+        `https://${req.rebelsConfig.region}.api.riotgames.com/tft/match/v1/matches/by-puuid/${req.params.puuid}/ids`
       ),
       {
         params: {
@@ -31,51 +31,25 @@ router.get('/get-matches/by-puuid/:puuid', async (req, res) => {
     });
 });
 
-router.get('/get-match-details', async (req, res) => {
-  if (!req.rebelsConfig.region) {
+router.get('/get-match/by-match-id/:matchId', async (req, res) => {
+  if (!req.rebelsConfig.region || !req.params.matchId) {
     res.status(400).json({ message: 'Bad request' });
   }
 
-  if (!req.query.matchIds) {
-    res.status(400).json({ message: 'matchIds query parameter not passed' });
-  }
+  await axios
+    .get(
+      encodeURI(
+        `https://${req.rebelsConfig.region}.api.riotgames.com/tft/match/v1/matches/${req.params.matchId}`
+      )
+    )
+    .then((result) => {
+      res.status(result.status).json(result.data);
+    })
+    .catch((error) => {
+      console.log(error);
 
-  try {
-    const array = JSON.parse(req.query.matchIds);
-
-    if (array.length <= 0) {
-      res.status(400).json({ message: 'matchIds array is empty' });
-    }
-
-    const results = await Promise.all(
-      array.map(async (matchId) => {
-        return await axios
-          .get(
-            `https://${req.rebelsConfig.region}.api.riotgames.com/tft/match/v1/matches/${matchId}`
-          )
-          .then((result) => {
-            return result.data;
-          })
-          .catch((error) => {
-            console.log(error);
-
-            throw error;
-          });
-      })
-    );
-
-    const orderedResults = results.sort();
-
-    const latestMatchDateTime = orderedResults[0].info.game_datetime;
-
-    res.status(200).json({
-      latestMatchDateTime: latestMatchDateTime,
-      matchIds: array,
-      results: orderedResults,
+      res.status(500).json({ message: 'Error fetching data' });
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching data' });
-  }
 });
 
 module.exports = router;
