@@ -212,56 +212,64 @@ router.use(
 );
 
 router.get('/get-match-details', async (req, res) => {
-  if (!req.query.matchIds) {
-    res.status(400).json({ message: 'matchIds query parameter not passed' });
-  }
-
   if (!req.query.regionalRoute) {
     res
       .status(400)
       .json({ message: 'regionalRoute query parameter not passed' });
-  }
+  } else {
+    if (!req.query.matchIds) {
+      res
+        .status(400)
+        .json({ message: 'matchIds query parameter not passed or empty' });
+    } else {
+      try {
+        const array = req.query.matchIds;
 
-  res.status(200);
+        if (array.length <= 0) {
+          throw new Error();
+        } else {
+          try {
+            var baseUrl = req.protocol + '://' + req.get('host');
 
-  try {
-    const array = JSON.parse(req.query.matchIds);
+            const results = await Promise.all(
+              array.map(async (matchId) => {
+                return await axios
+                  .get(
+                    `${baseUrl}/tft/${req.query.regionalRoute}/get-match/by-match-id/${matchId}`,
+                    {}
+                  )
+                  .then((result) => {
+                    return result.data;
+                  })
+                  .catch((error) => {
+                    console.log(error);
 
-    if (array.length <= 0) {
-      res.status(400).json({ message: 'matchIds array is empty' });
+                    throw error;
+                  });
+              })
+            ).catch((error) => {
+              console.log(error);
+
+              throw error;
+            });
+
+            const orderedResults = results.sort();
+
+            const latestMatchDateTime = orderedResults[0].info.game_datetime;
+
+            res.status(200).json({
+              latestMatchDateTime: latestMatchDateTime,
+              matchIds: array,
+              // results: orderedResults,
+            });
+          } catch (error) {
+            res.status(500).json({ message: 'Error fetching data' });
+          }
+        }
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching data' });
+      }
     }
-
-    var baseUrl = req.protocol + '://' + req.get('host');
-
-    const results = await Promise.all(
-      array.map(async (matchId) => {
-        return await axios
-          .get(
-            `${baseUrl}/tft/${req.query.regionalRoute}/get-match/by-match-id/${matchId}`,
-            {}
-          )
-          .then((result) => {
-            return result.data;
-          })
-          .catch((error) => {
-            console.log(error);
-
-            throw error;
-          });
-      })
-    );
-
-    const orderedResults = results.sort();
-
-    const latestMatchDateTime = orderedResults[0].info.game_datetime;
-
-    res.status(200).json({
-      latestMatchDateTime: latestMatchDateTime,
-      matchIds: array,
-      results: orderedResults,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching data' });
   }
 });
 
