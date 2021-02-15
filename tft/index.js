@@ -260,7 +260,7 @@ router.get('/get-match-details', async (req, res) => {
             res.status(200).json({
               latestMatchDateTime: latestMatchDateTime,
               matchIds: array,
-              // results: orderedResults,
+              results: orderedResults,
             });
           } catch (error) {
             res.status(500).json({ message: 'Error fetching data' });
