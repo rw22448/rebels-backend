@@ -229,7 +229,7 @@ router.get('/get-match-details', async (req, res) => {
           throw new Error();
         } else {
           try {
-            var baseUrl = req.protocol + '://' + req.get('host');
+            let baseUrl = req.protocol + '://' + req.get('host');
 
             const results = await Promise.all(
               array.map(async (matchId) => {
@@ -241,21 +241,30 @@ router.get('/get-match-details', async (req, res) => {
                   .then((result) => {
                     return result.data;
                   })
-                  .catch((error) => {
-                    console.log(error);
-
-                    throw error;
+                  .catch(() => {
+                    return;
                   });
               })
-            ).catch((error) => {
-              console.log(error);
+            );
 
-              throw error;
-            });
+            var trueLength = 0;
 
-            const orderedResults = results.sort();
+            for (var i = 0; i < results.length; i++) {
+              if (results[i] !== undefined) {
+                trueLength++;
+              }
+            }
 
-            const latestMatchDateTime = orderedResults[0].info.game_datetime;
+            let orderedResults = [];
+            let latestMatchDateTime = null;
+
+            if (trueLength > 0) {
+              orderedResults = results.sort();
+
+              if (orderedResults[0].hasOwnProperty('info')) {
+                latestMatchDateTime = orderedResults[0].info.game_datetime;
+              }
+            }
 
             res.status(200).json({
               latestMatchDateTime: latestMatchDateTime,
