@@ -50,18 +50,13 @@ router.get('/get-latest-match-details/by-puuid/:puuid', async (req, res) => {
                     `${baseUrl}/tft/${req.rebelsConfig.region}/get-match/by-match-id/${matchId}`
                   )
                   .then((result) => {
-                    console.log('Fetched result');
                     return result.data;
                   })
                   .catch(() => {
-                    console.log('Error fetching result');
-
                     return;
                   });
               })
             );
-
-            console.log('Finished fetching all results');
 
             var trueLength = 0;
 
