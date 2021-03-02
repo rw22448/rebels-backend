@@ -70,7 +70,13 @@ router.get('/get-latest-match-details/by-puuid/:puuid', async (req, res) => {
             let latestMatchDateTime = null;
 
             if (trueLength > 0) {
-              orderedResults = results.sort();
+              orderedResults = results.sort((a, b) =>
+                a.info.game_datetime > b.info.game_datetime
+                  ? -1
+                  : b.info.game_datetime > a.info.game_datetime
+                  ? 1
+                  : 0
+              );
 
               if (orderedResults[0].hasOwnProperty('info')) {
                 latestMatchDateTime = orderedResults[0].info.game_datetime;
